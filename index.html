@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Üretim Zaman Hesaplayıcı</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --line:#d8e2ef;
+      --text:#111827;
+      --muted:#6b7280;
+      --input:#fff4bf;
+      --blue:#2563eb;
+      --soft:#eef4ff;
+      --green:#0f766e;
+      --side:#f8fafc;
+      --danger:#991b1b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:linear-gradient(180deg,#eef4ff 0%,var(--bg) 42%,#ffffff 100%);
+      color:var(--text);
+      padding:18px;
+    }
+    .wrap{max-width:1120px;margin:0 auto}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:0 10px 28px rgba(15,23,42,.09);
+      overflow:hidden;
+    }
+    header{
+      padding:20px 22px;
+      background:var(--soft);
+      border-bottom:1px solid var(--line);
+    }
+    h1{font-size:26px;margin:0 0 6px;letter-spacing:.2px}
+    .subtitle{margin:0;color:var(--muted);font-size:14px}
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1.55fr) minmax(280px,.9fr);
+      gap:18px;
+      padding:20px;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:14px;
+      margin:0 0 14px;
+      line-height:1.45;
+    }
+    table{width:100%;border-collapse:collapse;margin:10px 0 18px;background:#fff}
+    th,td{border:1px solid var(--line);padding:11px;text-align:left;vertical-align:middle}
+    th{background:#f3f6fb;font-size:14px}
+    td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+    input{
+      width:100%;
+      padding:10px;
+      border:1px solid #c9d3e2;
+      border-radius:9px;
+      background:var(--input);
+      font-size:16px;
+      text-align:right;
+      outline:none;
+    }
+    input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.14)}
+    .result{background:#f9fafb;font-weight:700}
+    .big{font-size:20px;color:var(--blue)}
+    .positive{color:var(--green)}
+    .sidebox{
+      background:var(--side);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+      height:max-content;
+    }
+    .sidebox h2{font-size:18px;margin:0 0 10px}
+    .sidebox ol{margin:0;padding-left:21px;color:#374151;line-height:1.55;font-size:14px}
+    .sidebox li{margin-bottom:8px}
+    .sidebox .privacy{
+      margin-top:14px;
+      padding:12px;
+      border-radius:12px;
+      background:#ffffff;
+      border:1px dashed #cbd5e1;
+      color:#334155;
+      font-size:13px;
+      line-height:1.45;
+    }
+    footer{
+      border-top:1px solid var(--line);
+      padding:16px 20px 18px;
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+      background:#fbfdff;
+    }
+    .credit{margin-top:8px;color:#111827;font-weight:700}
+    .version{margin-top:4px;font-size:12px;color:#94a3b8}
+    @media (max-width:840px){
+      body{padding:10px}
+      .layout{grid-template-columns:1fr;padding:14px;gap:14px}
+      h1{font-size:22px}
+      th,td{padding:8px;font-size:14px}
+      input{font-size:14px}
+      .big{font-size:17px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <h1>⏱️ Üretim Zaman Hesaplayıcı</h1>
+        <p class="subtitle">Binaların saatlik üretimini gir, 24 saatlik üretimi ve hedefe kalan süreyi otomatik hesapla.</p>
+      </header>
+
+      <main class="layout">
+        <section>
+          <p class="hint">Sarı alanlara kendi değerlerini yaz. 5. bina opsiyoneldir; yoksa boş bırak veya 0 yaz.</p>
+
+          <table>
+            <thead>
+              <tr><th>Bina</th><th>Saatlik Üretim</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Bina 1</td><td><input id="b1" type="number" min="0" inputmode="numeric" placeholder="0" oninput="hesapla()"></td></tr>
+              <tr><td>Bina 2</td><td><input id="b2" type="number" min="0" inputmode="numeric" placeholder="0" oninput="hesapla()"></td></tr>
+              <tr><td>Bina 3</td><td><input id="b3" type="number" min="0" inputmode="numeric" placeholder="0" oninput="hesapla()"></td></tr>
+              <tr><td>Bina 4</td><td><input id="b4" type="number" min="0" inputmode="numeric" placeholder="0" oninput="hesapla()"></td></tr>
+              <tr><td>Bina 5 <span style="color:#64748b">(Weekly Pass)</span></td><td><input id="b5" type="number" min="0" inputmode="numeric" placeholder="0" oninput="hesapla()"></td></tr>
+            </tbody>
+          </table>
+
+          <table>
+            <tbody>
+              <tr class="result"><td>Toplam Saatlik Üretim</td><td class="num" id="toplamSaatlik">0</td></tr>
+              <tr class="result"><td>24 Saatlik Toplam Üretim</td><td class="num" id="gunlukUretim">0</td></tr>
+            </tbody>
+          </table>
+
+          <table>
+            <tbody>
+              <tr><td>Hedef Miktar</td><td><input id="hedef" type="number" min="0" inputmode="numeric" placeholder="0" oninput="hesapla()"></td></tr>
+              <tr><td>Mevcut Stok <span style="color:#64748b">(Opsiyonel)</span></td><td><input id="stok" type="number" min="0" inputmode="numeric" placeholder="0" oninput="hesapla()"></td></tr>
+              <tr class="result"><td>Net İhtiyaç</td><td class="num" id="net">0</td></tr>
+            </tbody>
+          </table>
+
+          <table>
+            <tbody>
+              <tr class="result"><td>Gerekli Süre</td><td class="num big" id="sonuc">0 saat 0 dakika</td></tr>
+              <tr class="result"><td>Gerekli Süre / Saat</td><td class="num" id="saat">0</td></tr>
+              <tr class="result"><td>Gerekli Süre / Gün</td><td class="num" id="gun">0</td></tr>
+              <tr class="result"><td>Durum</td><td class="num positive" id="durum">Değer giriniz</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <aside class="sidebox">
+          <h2>HOW TO USE</h2>
+          <ol>
+            <li>Enter the hourly production value for each building.</li>
+            <li>Building 5 is optional. Leave it empty if you do not use it.</li>
+            <li>Enter your target amount.</li>
+            <li>Enter your current stock if available.</li>
+            <li>The calculator will automatically show total hourly production, 24-hour production, remaining requirement, and required time.</li>
+            <li>No data is stored, transmitted, or shared.</li>
+            <li>All calculations are performed locally in your browser.</li>
+          </ol>
+
+          <div class="privacy">
+            This page does not store any data.<br>
+            All calculations are performed locally on your device.
+          </div>
+        </aside>
+      </main>
+
+      <footer>
+        Bu sayfa veri kaydetmez. Girdiğiniz bina üretimleri, hedef miktar ve mevcut stok yalnızca kendi cihazınızda hesaplanır. Bilgileriniz hiçbir yere gönderilmez, saklanmaz veya paylaşılmaz.
+        <div class="credit">Developed by Valar Ozy<br>TRSF Alliance | Server 798</div>
+        <div class="version">Version 1.0</div>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    function sayi(id){
+      return Number(document.getElementById(id).value || 0);
+    }
+
+    function format(n){
+      return Math.round(n).toLocaleString('tr-TR');
+    }
+
+    function formatDecimal(n){
+      return n.toLocaleString('tr-TR', {maximumFractionDigits: 2});
+    }
+
+    function hesapla(){
+      const toplam = sayi('b1') + sayi('b2') + sayi('b3') + sayi('b4') + sayi('b5');
+      const gunluk = toplam * 24;
+      const hedef = sayi('hedef');
+      const stok = sayi('stok');
+      const net = Math.max(hedef - stok, 0);
+      const saat = toplam > 0 ? net / toplam : 0;
+      const gun = gunluk > 0 ? net / gunluk : 0;
+      const tamSaat = Math.floor(saat);
+      const dakika = Math.floor((saat - tamSaat) * 60);
+      const saniye = Math.round((((saat - tamSaat) * 60) - dakika) * 60);
+
+      document.getElementById('toplamSaatlik').textContent = format(toplam);
+      document.getElementById('gunlukUretim').textContent = format(gunluk);
+      document.getElementById('net').textContent = format(net);
+      document.getElementById('saat').textContent = formatDecimal(saat);
+      document.getElementById('gun').textContent = formatDecimal(gun);
+
+      let sonuc = tamSaat + ' saat ' + dakika + ' dakika';
+      if (saat > 0 && saat < 1) sonuc = dakika + ' dakika ' + saniye + ' saniye';
+      if (net === 0 && hedef > 0) sonuc = 'Hedef tamamlandı';
+      if (toplam === 0 && net > 0) sonuc = 'Üretim değeri giriniz';
+      document.getElementById('sonuc').textContent = sonuc;
+
+      const durumEl = document.getElementById('durum');
+      if (hedef === 0) {
+        durumEl.textContent = 'Hedef giriniz';
+        durumEl.className = 'num';
+      } else if (net === 0) {
+        durumEl.textContent = 'Yeterli stok var';
+        durumEl.className = 'num positive';
+      } else if (toplam === 0) {
+        durumEl.textContent = 'Üretim bekleniyor';
+        durumEl.className = 'num';
+      } else {
+        durumEl.textContent = 'Hesaplandı';
+        durumEl.className = 'num positive';
+      }
+    }
+
+    hesapla();
+  </script>
+</body>
+</html>
